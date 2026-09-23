@@ -8369,6 +8369,13 @@ function milkMismatch(actual, wanted, availableKinds, c){
   return 0;
 }
 
+/* Direktkauf gibt es nur für die online verkäuflichen Maschinen
+   (WMF Elevation 10, WMF Peak 50) – alle übrigen Maschinen werden
+   ausschließlich über den Vertrieb angeboten (kein Buy-Button). */
+function buyableOnline(m){
+  return !!m && (m.id === 'peak-50' || m.id === 'elevation-10');
+}
+
 function findMachineImage(m, c){
   const model = MACHINE_IMAGE_MODELS[m.id];
   const source = Array.isArray(window.WMF_MACHINE_IMAGES) ? window.WMF_MACHINE_IMAGES : [];
@@ -10413,11 +10420,15 @@ function renderRecos(){
             '<span class="eyebrow pricerange__l">Net guide price · depending on equipment</span>'+
           '</div>'+
 
-          /* Button-Reihe Configure (Secondary) · Buy (Primary), linksbündig */
+          /* Button-Reihe Configure (Secondary) · Buy (Primary), linksbündig.
+             Kaufen gibt es nur für online verkäufliche Maschinen
+             (Elevation 10, Peak 50) – alle anderen laufen über den Vertrieb. */
           '<div class="reco__ctarow">'+
             '<button type="button" class="btn btn--secondary reco__cfgbtn" data-cfg="'+esc(m.id)+'">Configure</button>'+
-            '<button class="btn btn--primary reco__buy" '+
-              'data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with the '+esc(m.name)+'.">Buy'+ARROW+'</button>'+
+            (buyableOnline(m)
+              ? '<button class="btn btn--primary reco__buy" '+
+                'data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with the '+esc(m.name)+'.">Buy'+ARROW+'</button>'
+              : '')+
           '</div>'+
         '</div>'+
       '</article>'+
@@ -11323,8 +11334,12 @@ function renderSummary(){
     '</div>'+
 
     '<div class="result__actions">'+
-      '<button class="btn btn--primary" data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with your configuration.">Buy configuration'+ARROW+'</button>'+
-      '<button class="btn btn--secondary" id="btnConsult" type="button">Request a consultation</button>'+
+      /* Kaufen nur für online verkäufliche Maschinen (Elevation 10, Peak 50) –
+         bei allen anderen ist die Beratung der primäre Abschlussweg. */
+      (buyableOnline(m)
+        ? '<button class="btn btn--primary" data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with your configuration.">Buy configuration'+ARROW+'</button>'
+        : '')+
+      '<button class="btn '+(buyableOnline(m) ? 'btn--secondary' : 'btn--primary')+'" id="btnConsult" type="button">Request a consultation</button>'+
       '<button class="btn btn--secondary" id="btnEditConfig">Edit configuration</button>'+
       '<button class="btn btn--secondary" id="btnSaveEnd">Save configuration</button>'+
       '<button class="btn btn--secondary" id="btnDownloadSummary" type="button">'+
