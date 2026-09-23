@@ -11316,11 +11316,11 @@ function renderSummary(){
 
     '<div class="result__actions">'+
       /* Kaufen nur für online verkäufliche Maschinen (Elevation 10, Peak 50) –
-         bei allen anderen ist die Beratung der primäre Abschlussweg. */
+         alle übrigen Buttons bleiben bei allen Maschinen unverändert. */
       (buyableOnline(m)
         ? '<button class="btn btn--primary" data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with your configuration.">Buy configuration'+ARROW+'</button>'
         : '')+
-      '<button class="btn '+(buyableOnline(m) ? 'btn--secondary' : 'btn--primary')+'" id="btnConsult" type="button">Request a consultation</button>'+
+      '<button class="btn btn--secondary" id="btnConsult" type="button">Request a consultation</button>'+
       '<button class="btn btn--secondary" id="btnEditConfig">Edit configuration</button>'+
       '<button class="btn btn--secondary" id="btnSaveEnd">Save configuration</button>'+
       '<button class="btn btn--secondary" id="btnDownloadSummary" type="button">'+
