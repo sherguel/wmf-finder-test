@@ -1354,14 +1354,9 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .afhelp__txt{flex:1;min-width:0;}
 .afhelp__t{display:block;font-size:14px;font-weight:680;color:var(--ink);letter-spacing:-.005em;}
 .afhelp__s{display:block;font-size:12.5px;line-height:1.5;color:var(--text-3);margin-top:1px;}
-.afhelp__btn{
-  display:flex;align-items:center;gap:8px;flex-shrink:0;white-space:nowrap;
-  font-size:14px;font-weight:640;color:var(--brown);
-  transition:color .15s var(--ease);
-}
-.afhelp__btn:hover{color:var(--brown-dark);}
-.afhelp__btn svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s var(--ease);}
-.afhelp__btn:hover svg{transform:translateX(2px);}
+/* Auf Wunsch als Primary Button (WMF-Braun) statt Pfeil-Link – etwas
+   kompakter, damit die Kontaktzeile schlank bleibt. */
+.afhelp__btn{flex-shrink:0;height:36px;padding:0 18px;font-size:14px;}
 @media(max-width:620px){
   .afhelp{flex-wrap:wrap;padding:12px 14px;gap:10px 12px;}
   .afhelp__txt{flex:1 1 calc(100% - 48px);}
@@ -9682,7 +9677,7 @@ function renderQuestion(){
           '<span class="afhelp__t">Faster with personal help?</span>'+
           '<span class="afhelp__s">You don&rsquo;t have to answer every question &ndash; our sales team will find the right machine with you.</span>'+
         '</span>'+
-        '<button type="button" class="afhelp__btn" id="afHelpBtn">Contact sales'+ARROW+'</button>'+
+        '<button type="button" class="btn btn--primary afhelp__btn" id="afHelpBtn">Contact sales'+ARROW+'</button>'+
       '</div>';
     }
 
