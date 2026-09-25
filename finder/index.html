@@ -8371,6 +8371,15 @@ function buyableOnline(m){
   return !!m && (m.id === 'peak-50' || m.id === 'elevation-10');
 }
 
+/* Preise werden nur bei den online verkäuflichen Maschinen gezeigt
+   (Elevation 10, Peak 50) – alle übrigen Maschinen laufen ohne
+   Preisangaben („Price on request“, individuelles Angebot über den
+   Vertrieb). Gilt für Karten, Konfigurator, Vergleich, Summary,
+   Anfrage-Text und PDF. */
+function priceVisible(m){
+  return buyableOnline(m);
+}
+
 function findMachineImage(m, c){
   const model = MACHINE_IMAGE_MODELS[m.id];
   const source = Array.isArray(window.WMF_MACHINE_IMAGES) ? window.WMF_MACHINE_IMAGES : [];
@@ -10411,8 +10420,11 @@ function renderRecos(){
           '</div>'+
 
           '<div class="pricerange">'+
-            '<span class="pricerange__v">'+priceLabel(rng)+'</span>'+
-            '<span class="eyebrow pricerange__l">Net guide price · depending on equipment</span>'+
+            (priceVisible(m)
+              ? '<span class="pricerange__v">'+priceLabel(rng)+'</span>'+
+                '<span class="eyebrow pricerange__l">Net guide price · depending on equipment</span>'
+              : '<span class="pricerange__v">Price on request</span>'+
+                '<span class="eyebrow pricerange__l">Individual quote from WMF sales</span>')+
           '</div>'+
 
           /* Button-Reihe Configure (Secondary) · Buy (Primary), linksbündig.
@@ -10776,11 +10788,16 @@ function renderPlate(){
     '<div class="plate__head"><span class="plate__name">'+esc(m.name)+'</span>'+
     '<span class="eyebrow">'+esc(m.typeLabel)+'</span></div>'+
     '<div>'+rows.join('')+'</div>'+
-    '<div class="plate__price"><span class="eyebrow">Guide price</span>'+
-    '<span class="plate__pv">'+priceLabel(rng)+'</span></div>'+
-    /* Hinweis: Preis ab Werk, Nebenkosten kommen hinzu */
-    '<p class="plate__note">All prices ex works. Additional costs such as transport, '+
-    'installation and commissioning are charged separately.</p>'+
+    (priceVisible(m)
+      ? '<div class="plate__price"><span class="eyebrow">Guide price</span>'+
+        '<span class="plate__pv">'+priceLabel(rng)+'</span></div>'+
+        /* Hinweis: Preis ab Werk, Nebenkosten kommen hinzu */
+        '<p class="plate__note">All prices ex works. Additional costs such as transport, '+
+        'installation and commissioning are charged separately.</p>'
+      : '<div class="plate__price"><span class="eyebrow">Guide price</span>'+
+        '<span class="plate__pv">On request</span></div>'+
+        '<p class="plate__note">You will receive an individual quote for this '+
+        'configuration from WMF sales.</p>')+
     /* V6: Vergleich mit einer weiteren Maschine */
     '<button type="button" class="reco__link reco__link--arrow plate__compare" id="btnCompare">'+
       'Compare with another machine'+ARROW+'</button>';
@@ -10802,7 +10819,7 @@ function renderConfigStep(){
         ? (c[g.key] || []).indexOf(o.v) >= 0
         : String(c[g.key]) === String(o.v);
       const mark = g.type === 'multi' ? 'mark-check' : 'mark-radio';
-      const price = o.price ? '<span class="cfgopt__price">+ '+eur(o.price)+'</span>' : '';
+      const price = (priceVisible(m) && o.price) ? '<span class="cfgopt__price">+ '+eur(o.price)+'</span>' : '';
       const flag = o.flag
         ? '<span class="cfgopt__flag'+(o.flag === 'Recommended' ? ' cfgopt__flag--rec' : '')+'">'+esc(o.flag)+'</span>'
         : '';
@@ -10999,11 +11016,15 @@ function renderPdp(){
         '<span class="eyebrow eyebrow--copper pdp__type">'+esc(m.typeLabel)+'</span>'+
         '<h1 class="pdp__name">'+esc(m.name)+'</h1>'+
         '<p class="t-body pdp__lead">'+prodDesc(m)+' Configure hoppers, milk system, '+
-          'connections and equipment step by step – with a live guide price.</p>'+
+          'connections and equipment step by step'+
+          (priceVisible(m) ? ' – with a live guide price.' : '.')+'</p>'+
         '<ul class="pdp__facts">'+facts.map(f => '<li>'+CHECK+'<span>'+esc(f)+'</span></li>').join('')+'</ul>'+
         '<div class="pdp__price">'+
-          '<span class="eyebrow">Net guide price · depending on equipment</span>'+
-          '<b>'+priceLabel(rng)+'</b>'+
+          (priceVisible(m)
+            ? '<span class="eyebrow">Net guide price · depending on equipment</span>'+
+              '<b>'+priceLabel(rng)+'</b>'
+            : '<span class="eyebrow">Individual quote from WMF sales</span>'+
+              '<b>Price on request</b>')+
         '</div>'+
         '<div class="pdp__ctarow">'+
           '<button type="button" class="btn btn--primary" id="btnPdpConfigure">Configure this machine'+ARROW+'</button>'+
@@ -11031,7 +11052,8 @@ function cmpRows(a, b){
     ['Powder hoppers',  m => 'up to ' + maxPowder(m)],
     ['Water',           m => m.water.indexOf('tank') >= 0 ? 'fixed or tank' : 'fixed connection'],
     ['Dimensions (mm)', m => m.dims.join(' × ')],
-    ['Guide price range', m => priceLabel(priceRange(m, {}))]
+    /* Preise nur bei online verkäuflichen Maschinen – sonst „on request“ */
+    ['Guide price range', m => priceVisible(m) ? priceLabel(priceRange(m, {})) : 'on request']
   ];
   return rows.map(r => {
     const va = val(a, r[1]), vb = val(b, r[1]);
@@ -11054,7 +11076,8 @@ function renderCompare(){
     state.compareId = b.id;
   }
   const rows = cmpRows(a, b);
-  const yourPrice = priceLabel(priceRange(a, state.configuration));
+  const yourPrice = priceVisible(a)
+    ? priceLabel(priceRange(a, state.configuration)) : 'on request';
   $('compareMount').innerHTML =
     '<button type="button" class="linkbtn pdp__back" id="btnCmpBack" style="margin-top:var(--sp-6)">'+
       '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M21 12H4M9 6l-6 6 6 6"/></svg>'+
@@ -11123,7 +11146,8 @@ function summaryAlternativesHTML(m){
 
   const rowsPer = picks.map(p => cmpRows(m, p.m));
   const labels = rowsPer[0].map(r => r.label);
-  const yourPrice = priceLabel(priceRange(m, state.configuration));
+  const yourPrice = priceVisible(m)
+    ? priceLabel(priceRange(m, state.configuration)) : 'on request';
 
   const col = (machine, roleHTML, rows, priceRow, cta) =>
     '<div class="cmp__col">'+
@@ -11227,14 +11251,16 @@ function renderInquiry(){
       }
       lines.push('- ' + asp.label + ': ' + configLabel(asp.key));
     });
-    lines.push('Net guide price: ' + priceLabel(priceRange(m, state.configuration)));
+    if(priceVisible(m))
+      lines.push('Net guide price: ' + priceLabel(priceRange(m, state.configuration)));
     lines.push('Retrieval code: ' + encodeStateCode());
     lines.push('');
   }else if(state.recommendedMachines.length){
     lines.push('My recommended machines:');
     state.recommendedMachines.forEach((r, i) => {
       const rng = priceRange(r.machine, partialFromAnswers(r.machine, a));
-      lines.push((i + 1) + '. ' + r.machine.name + ' (' + r.pct + ' % match) – guide price ' + priceLabel(rng));
+      lines.push((i + 1) + '. ' + r.machine.name + ' (' + r.pct + ' % match)'+
+        (priceVisible(r.machine) ? ' – guide price ' + priceLabel(rng) : ''));
     });
     if(state.splitPick)
       lines.push('Also of interest: the split option with ' + state.splitPick.n + ' x ' + state.splitPick.name + '.');
@@ -11309,10 +11335,15 @@ function renderSummary(){
         '<span class="eyebrow result__blockhead">Summary</span>'+
         '<div class="specs">'+rows.join('')+'</div>'+
         '<div class="pricerange" style="margin-top:var(--sp-5)">'+
-          '<span class="pricerange__v">'+priceLabel(rng)+'</span>'+
-          '<span class="eyebrow pricerange__l">Net guide price for this configuration</span>'+
-          '<p class="plate__note">All prices ex works. Additional costs such as transport, '+
-          'installation and commissioning are charged separately.</p>'+
+          (priceVisible(m)
+            ? '<span class="pricerange__v">'+priceLabel(rng)+'</span>'+
+              '<span class="eyebrow pricerange__l">Net guide price for this configuration</span>'+
+              '<p class="plate__note">All prices ex works. Additional costs such as transport, '+
+              'installation and commissioning are charged separately.</p>'
+            : '<span class="pricerange__v">Price on request</span>'+
+              '<span class="eyebrow pricerange__l">Individual quote from WMF sales</span>'+
+              '<p class="plate__note">Send the inquiry or request a consultation – '+
+              'WMF sales will quote this configuration individually.</p>')+
         '</div>'+
       '</div>'+
       '<div>'+
@@ -11323,7 +11354,9 @@ function renderSummary(){
         (ev.gaps.length
           ? '<div class="boost" style="margin-top:var(--sp-5)"><b>Still open:</b> '+
             ev.gaps.map(g => esc(g.fix)).join(' ')+'</div>' : '')+
-        '<p class="disclaimer">All prices are non-binding guide values for this draft. '+
+        '<p class="disclaimer">'+(priceVisible(m)
+          ? 'All prices are non-binding guide values for this draft. '
+          : 'All specifications are non-binding for this draft. ')+
         'Installation, water treatment and site-specific services are not included.</p>'+
       '</div>'+
     '</div>'+
@@ -11418,7 +11451,9 @@ function downloadSummary(){
   const today = new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'long', year:'numeric'});
 
   const rows = [];
-  const row = (k, v, p) => rows.push({k:k, v:v, p:(p ? '+ ' + eur(p) : 'included')});
+  /* Preisspalte nur bei online verkäuflichen Maschinen (priceVisible) */
+  const row = (k, v, p) => rows.push({k:k, v:v,
+    p:(priceVisible(m) ? (p ? '+ ' + eur(p) : 'included') : '')});
   if(c.beans != null) row('Beans', BEAN_OPTIONS[c.beans].t, BEAN_OPTIONS[c.beans].price);
   if(c.milk != null && MILK_SYSTEMS[c.milk]) row('Milk system', MILK_SYSTEMS[c.milk].t, MILK_SYSTEMS[c.milk].price);
   if(c.powder != null) row('Powder', POWDER_OPTIONS[c.powder].t, POWDER_OPTIONS[c.powder].price);
@@ -11529,8 +11564,14 @@ function downloadSummary(){
     need(50);
     y += 8;
     R(MX, y, W - 2 * MX, 30, SOFT);
-    T(MX + 12, y + 19, 9.5, 'F1', 'Net guide price for this configuration');
-    T(362, y + 20, 13, 'F2', priceLabel(rng)); y += 48;
+    if(priceVisible(m)){
+      T(MX + 12, y + 19, 9.5, 'F1', 'Net guide price for this configuration');
+      T(362, y + 20, 13, 'F2', priceLabel(rng));
+    }else{
+      T(MX + 12, y + 19, 9.5, 'F1', 'Price on request - individual quote from WMF sales');
+      T(400, y + 20, 13, 'F2', 'On request');
+    }
+    y += 48;
     if(reqs.length){
       need(22 + reqs.length * 15);
       T(MX, y, 9, 'F2', 'YOUR REQUIREMENTS FROM THE MACHINE FINDER', BROWN); y += 15;
@@ -11563,7 +11604,9 @@ function downloadSummary(){
     need(36);
     [
       'Enter this code in the first step of the WMF Machine Finder to reopen this exact configuration on any device.',
-      'All prices are non-binding net guide values for this draft, quoted ex works. Additional costs such as transport,',
+      (priceVisible(m)
+        ? 'All prices are non-binding net guide values for this draft, quoted ex works. Additional costs such as transport,'
+        : 'All specifications are non-binding for this draft. Additional costs such as transport,'),
       'installation and commissioning as well as water treatment and site-specific services are charged separately.'
     ].forEach(t => { T(MX, y, 7.5, 'F1', t, GRAY); y += 10; });
 
