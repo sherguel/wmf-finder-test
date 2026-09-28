@@ -7713,12 +7713,13 @@ const QUESTIONS = [
     info:[
       '<b>What you define here:</b> the daily capacity – a hard filter: machines below your volume drop out of the recommendation.',
       '<b>Why three tiers?</b> The thresholds match the capacity classes of the portfolio: up to 80 cups (compact class), up to 180 cups (mid-range), and the premium class above that. Within one tier, the recommendation does not change.',
-      '<b>Peak times</b> are optional. Anyone serving 40 cups within fifteen minutes in the morning needs a different machine than someone with the same daily volume spread over eight hours.'
+      '<b>Peak times</b> are optional. Anyone serving 40 cups within fifteen minutes in the morning needs a different machine than someone with the same daily volume spread over eight hours.',
+      '<b>Rule of thumb:</b> plan on two to three coffees per person per day – 80 cups cover roughly 30 people, 180 cups roughly 70.'
     ],
     ranges:[
-      {v:80,  icon:'vol1', t:'Up to 80 cups',       d:'Small business, office floor or secondary outlet.', x:'Up to around 80 cups is covered by the compact class (WMF Peak 50). A size larger is worth it if peak times or growth are on the horizon.'},
-      {v:180, icon:'vol2', t:'81 to 180 cups',      d:'Regular daily business with peaks.', x:'The mid-range (WMF 1300 S, 1500 S+) for noticeable but predictable demand – including milk variety.'},
-      {v:350, icon:'vol3', t:'More than 180 cups',  d:'Continuous operation or high-traffic location.', x:'From here on, the premium models 5000 S+ and 9000 S+ take over – built for continuous load, parallel dispensing and large containers.'}
+      {v:80,  icon:'vol1', t:'Up to 80 cups',       d:'Small business, office floor or secondary outlet. ≈ up to 30 people.', x:'Up to around 80 cups is covered by the compact class (WMF Peak 50). A size larger is worth it if peak times or growth are on the horizon.'},
+      {v:180, icon:'vol2', t:'81 to 180 cups',      d:'Regular daily business with peaks. ≈ 30 to 70 people.', x:'The mid-range (WMF 1300 S, 1500 S+) for noticeable but predictable demand – including milk variety.'},
+      {v:350, icon:'vol3', t:'More than 180 cups',  d:'Continuous operation or high-traffic location. ≈ 70 people or more.', x:'From here on, the premium models 5000 S+ and 9000 S+ take over – built for continuous load, parallel dispensing and large containers.'}
     ],
     peaks:[
       {v:10, t:'Up to 10 cups'},
@@ -8361,6 +8362,16 @@ function priceVisible(m){
   return buyableOnline(m);
 }
 
+/* Faustregel Tassen -> Personen: 2–3 Tassen pro Person und Tag
+   (gerechnet mit 2,5; auf freundliche 5er-Schritte gerundet).
+   Beispiel: 80 Tassen ≈ 30 Personen, 180 ≈ 70, 250 ≈ 100. */
+function personsApprox(cups){
+  return Math.max(5, Math.round(cups / 2.5 / 5) * 5);
+}
+function personsLabel(cups){
+  return '≈ ' + personsApprox(cups) + ' people';
+}
+
 function findMachineImage(m, c){
   const model = MACHINE_IMAGE_MODELS[m.id];
   const source = Array.isArray(window.WMF_MACHINE_IMAGES) ? window.WMF_MACHINE_IMAGES : [];
@@ -8639,7 +8650,7 @@ function criteria(m, a){
     id:'volume', w:30, applies:true, hard:true,
     ok:m.cupsPerDay >= (a.volume || 0),
     label:'Daily capacity ' + (VOLUME_LABEL[a.volume] || (a.volume || 0) + ' cups'),
-    pass:'Designed for up to ' + m.cupsPerDay + ' cups a day – it covers your tier “' + (VOLUME_LABEL[a.volume] || a.volume) + '” with headroom to spare.',
+    pass:'Designed for up to ' + m.cupsPerDay + ' cups a day (' + personsLabel(m.cupsPerDay) + ') – it covers your tier “' + (VOLUME_LABEL[a.volume] || a.volume) + '” with headroom to spare.',
     fix:'This machine handles ' + m.cupsPerDay + ' cups a day. For “' + (VOLUME_LABEL[a.volume] || a.volume) + '” you would need a larger series or a second machine.'
   });
 
@@ -10754,7 +10765,7 @@ function aspectOpen(aspect){
 function renderPlate(){
   const m = state.selectedMachine;
   const rows = ['<div class="plate__row"><span class="plate__key">Capacity</span>'+
-    '<span class="plate__val">up to '+m.cupsPerDay+' cups / day</span></div>'];
+    '<span class="plate__val">up to '+m.cupsPerDay+' cups / day ('+personsLabel(m.cupsPerDay)+')</span></div>'];
 
   ASPECTS.forEach(asp => {
     if(state.configuration[asp.key] === undefined) return;
@@ -10914,7 +10925,7 @@ const PROD_CATEGORIES = [
 ];
 
 function prodDesc(m){
-  return esc(m.typeLabel) + ' for up to ' + m.cupsPerDay + ' cups/day.';
+  return esc(m.typeLabel) + ' for up to ' + m.cupsPerDay + ' cups/day (' + personsLabel(m.cupsPerDay) + ').';
 }
 
 /* EXAKTE Produktseite: der 1:1-Snapshot (products-snapshot.html) läuft in
@@ -10981,7 +10992,7 @@ function renderPdp(){
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">'+
     '<circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const facts = [
-    'Up to ' + m.cupsPerDay + ' cups per day · approx. ' + m.peak15 + ' cups per 15 minutes at peak',
+    'Up to ' + m.cupsPerDay + ' cups per day (' + personsLabel(m.cupsPerDay) + ') · approx. ' + m.peak15 + ' cups per 15 minutes at peak',
     m.milkTypesMax ? 'Up to ' + m.milkTypesMax + ' milk type' + (m.milkTypesMax > 1 ? 's' : '') + ' in parallel'
                    : (m.steam.length ? 'Steam wand for milk foam' : 'Pure coffee machine – no milk system'),
     'Up to ' + maxBeans(m) + ' bean hopper' + (maxBeans(m) > 1 ? 's' : ''),
@@ -11025,7 +11036,7 @@ function cmpRows(a, b){
   const val = (m, fn) => fn(m);
   const rows = [
     ['Type',            m => m.typeLabel],
-    ['Daily capacity',  m => 'up to ' + m.cupsPerDay + ' cups'],
+    ['Daily capacity',  m => 'up to ' + m.cupsPerDay + ' cups (' + personsLabel(m.cupsPerDay) + ')'],
     ['Peak (15 min)',   m => 'approx. ' + m.peak15 + ' cups'],
     ['Milk types',      m => m.milkTypesMax ? 'up to ' + m.milkTypesMax + ' in parallel'
                              : (m.steam.length ? 'steam wand' : 'no milk system')],
@@ -11284,7 +11295,7 @@ function renderSummary(){
   const rng = priceRange(m, state.configuration);
 
   const rows = [specRow('Model', m.name), specRow('Type', m.typeLabel),
-                specRow('Capacity', 'up to ' + m.cupsPerDay + ' cups / day')];
+                specRow('Capacity', 'up to ' + m.cupsPerDay + ' cups / day (' + personsLabel(m.cupsPerDay) + ')')];
   ASPECTS.forEach(asp => {
     if(state.configuration[asp.key] === undefined) return;
     rows.push(specRow(asp.label, configLabel(asp.key)));
@@ -11523,7 +11534,7 @@ function downloadSummary(){
     L(MX, 78, W - MX, INK, 1.4);
     /* Maschine: Textblock links, Konfigurationsfoto rechts */
     T(MX, 116, 22, 'F2', m.name);
-    T(MX, 132, 8, 'F1', (m.typeLabel + ' - up to ' + m.cupsPerDay + ' cups / day').toUpperCase(), GRAY);
+    T(MX, 132, 8, 'F1', (m.typeLabel + ' - up to ' + m.cupsPerDay + ' cups / day (approx. ' + personsApprox(m.cupsPerDay) + ' people)').toUpperCase(), GRAY);
     T(MX, 148, 9.5, 'F1', 'Dimensions W x H x D: ' + m.dims.join(' x ') + ' mm', MID);
     let cfgTop = 180;
     if(machImg){
