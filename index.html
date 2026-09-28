@@ -1205,6 +1205,23 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .result__alts{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:1px solid var(--line);}
 /* Hinweis-Link auf den Vergleich, unterhalb der CTA-Reihe */
 .result__altslink{margin-top:var(--sp-4);}
+/* Kompakte Seitenvariante in der rechten Detail-Spalte */
+.result__alts--side{margin-top:var(--sp-6);padding-top:var(--sp-6);}
+.cmp--side{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;margin:var(--sp-4) 0 0;}
+.cmp--side .cmp__stage{height:120px;padding-top:10px;}
+.cmp--side .cmp__stage img{max-height:102px;}
+.cmp--side .cmp__name{font-size:15px;min-height:50px;}
+.cmp--side .cmp__row{
+  flex-direction:column;align-items:flex-start;justify-content:center;
+  gap:2px;min-height:0;padding:8px 0;font-size:13px;
+}
+.cmp--side .cmp__row::before{
+  content:attr(data-l);display:block;width:100%;
+  font-size:9.5px;font-weight:760;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--text-3);
+}
+.cmp--side .cmp__cta .btn{height:34px;padding:0 12px;font-size:12.5px;width:100%;white-space:nowrap;}
+@media(max-width:640px){.cmp.cmp--side{grid-template-columns:1fr;}}
 .cmp--summary{grid-template-columns:150px repeat(3,minmax(0,1fr));}
 .cmp--summary .cmp__cta .btn{height:36px;padding:0 12px;font-size:13px;width:100%;white-space:nowrap;}
 @media(max-width:1000px){
@@ -11155,39 +11172,25 @@ function summaryAlternativesHTML(m){
   if(!picks.length) return '';
 
   const rowsPer = picks.map(p => cmpRows(m, p.m));
-  const labels = rowsPer[0].map(r => r.label);
-  const yourPrice = priceVisible(m)
-    ? priceLabel(priceRange(m, state.configuration)) : 'on request';
 
-  const col = (machine, roleHTML, rows, priceRow, cta) =>
+  /* V8: KOMPAKTE Seitenvariante – sitzt in der rechten Spalte der
+     Detail-Sektion (unter „Why this machine is right for you“) und füllt
+     den vorher leeren Raum. Nur die beiden Alternativen als Karten mit
+     Labels ÜBER den Werten (wie die Mobilansicht); die eigene Maschine
+     steht ja bereits links in der Summary. Unterschiede fett. */
+  const col = (p, i) =>
     '<div class="cmp__col">'+
-      '<div class="cmp__stage">'+machineFigure(machine)+'</div>'+
-      '<div class="cmp__name">'+esc(machine.name)+roleHTML+'</div>'+
-      rows+priceRow+
-      '<div class="cmp__cta">'+cta+'</div>'+
+      '<div class="cmp__stage">'+machineFigure(p.m)+'</div>'+
+      '<div class="cmp__name">'+esc(p.m.name)+
+        '<span class="eyebrow cmp__tag" style="color:var(--text-3)">'+esc(p.role)+'</span></div>'+
+      rowsPer[i].map(r => '<div class="cmp__row'+(r.diff ? ' is-diff' : '')+'" data-l="'+esc(r.label)+'">'+esc(r.b)+'</div>').join('')+
+      '<div class="cmp__cta"><button type="button" class="btn btn--secondary" data-altcfg="'+esc(p.m.id)+'">Switch to this machine</button></div>'+
     '</div>';
 
-  return '<div class="result__alts">'+
-    '<span class="eyebrow eyebrow--copper" style="display:block;margin-bottom:6px">Alternative machines</span>'+
-    '<h3 class="t-md" style="margin-bottom:4px">Compare at a glance</h3>'+
-    '<p class="t-body" style="color:var(--text-2);max-width:70ch">Two alternatives to your configured machine – differences are highlighted. Switching restarts the configuration for the new machine.</p>'+
-    '<div class="cmp cmp--summary">'+
-      '<div class="cmp__col cmp__col--label" aria-hidden="true">'+
-        '<div class="cmp__stage"></div><div class="cmp__name"></div>'+
-        labels.map(l => '<div class="cmp__row cmp__row--label">'+esc(l)+'</div>').join('')+
-        '<div class="cmp__row cmp__row--label">Your configuration</div>'+
-        '<div class="cmp__cta"></div>'+
-      '</div>'+
-      col(m, '<span class="eyebrow cmp__tag">Your machine</span>',
-        rowsPer[0].map(r => '<div class="cmp__row" data-l="'+esc(r.label)+'">'+esc(r.a)+'</div>').join(''),
-        '<div class="cmp__row is-diff" data-l="Your configuration">'+esc(yourPrice)+'</div>',
-        '')+
-      picks.map((p, i) => col(p.m,
-        '<span class="eyebrow cmp__tag" style="color:var(--text-3)">'+esc(p.role)+'</span>',
-        rowsPer[i].map(r => '<div class="cmp__row'+(r.diff ? ' is-diff' : '')+'" data-l="'+esc(r.label)+'">'+esc(r.b)+'</div>').join(''),
-        '<div class="cmp__row" data-l="Your configuration">–</div>',
-        '<button type="button" class="btn btn--secondary" data-altcfg="'+esc(p.m.id)+'">Switch to this machine</button>')).join('')+
-    '</div>'+
+  return '<div class="result__alts result__alts--side">'+
+    '<span class="eyebrow result__blockhead">Alternative machines – compare at a glance</span>'+
+    '<p class="t-sm" style="margin-top:6px;max-width:60ch">Differences to your machine are highlighted. Switching restarts the configuration.</p>'+
+    '<div class="cmp cmp--side">'+picks.map(col).join('')+'</div>'+
   '</div>';
 }
 
@@ -11398,13 +11401,11 @@ function renderSummary(){
           ? 'All prices are non-binding guide values for this draft. '
           : 'All specifications are non-binding for this draft. ')+
         'Installation, water treatment and site-specific services are not included.</p>'+
+        /* Alternativen-Vergleich kompakt IN der rechten Spalte – füllt den
+           freien Raum unter der Begründung, Details links bleiben sichtbar */
+        altsHTML+
       '</div>'+
-    '</div>'+
-
-    /* Alternativen-Vergleich NACH den Konfigurations-Details – dank der
-       hochgezogenen CTAs deutlich höher als früher; der Link oben zeigt,
-       dass es ihn gibt. */
-    altsHTML;
+    '</div>';
 
   bindMachineImageFallback($('summaryMount'));
   const jump = $('btnJumpAlts');
