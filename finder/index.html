@@ -8402,13 +8402,13 @@ function buyableOnline(m){
   return !!m && (m.id === 'peak-50' || m.id === 'elevation-10');
 }
 
-/* Preise werden nur bei den online verkäuflichen Maschinen gezeigt
-   (Elevation 10, Peak 50) – alle übrigen Maschinen laufen ohne
-   Preisangaben („Price on request“, individuelles Angebot über den
-   Vertrieb). Gilt für Karten, Konfigurator, Vergleich, Summary,
-   Anfrage-Text und PDF. */
+/* Preisanzeige-Schalter (Karten, Konfigurator, Vergleich, Summary,
+   Anfrage-Text und PDF). Stand Sep 2026: Preise wieder ÜBERALL sichtbar
+   (die zwischenzeitliche „Price on request“-Variante für Nicht-Online-
+   Maschinen wurde zurückgenommen); für einen erneuten Test einfach
+   wieder `return buyableOnline(m);` einsetzen. */
 function priceVisible(m){
-  return buyableOnline(m);
+  return true;
 }
 
 /* Faustregel Tassen -> Personen: 2–3 Tassen pro Person und Tag
