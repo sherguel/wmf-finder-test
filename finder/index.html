@@ -639,6 +639,12 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .optcard__body{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;}
 .optcard__title{display:block;font-size:16px;font-weight:720;letter-spacing:-.01em;line-height:1.25;transition:color .4s var(--ease-lux);}
 .optcard__desc{display:block;font-size:14px;color:var(--text-2);line-height:1.45;transition:color .4s var(--ease-lux);}
+/* Personen-Schätzung: deutlich abgesetzte Zeile in Braun mit Icon */
+.optcard__persons{
+  display:inline-flex;align-items:center;gap:7px;margin-top:7px;
+  font-size:13px;font-weight:700;color:var(--brown);letter-spacing:-.005em;
+}
+.optcard__persons svg{width:15px;height:15px;flex-shrink:0;}
 /* Auswahl: Karte bleibt hell, bekommt aber eine Outline in dunklerem Grau */
 .optcard.is-selected{background:var(--card);border-color:var(--outline-card);box-shadow:0 0 0 1px var(--outline-card);}
 .optcard.is-selected:hover{background:var(--card-hover);}
@@ -7736,9 +7742,9 @@ const QUESTIONS = [
       '<b>Rule of thumb:</b> plan on two to three coffees per person per day – 80 cups cover roughly 30 people, 180 cups roughly 70.'
     ],
     ranges:[
-      {v:80,  icon:'vol1', t:'Up to 80 cups',       d:'Small business, office floor or secondary outlet. ≈ up to 30 people.', x:'Up to around 80 cups is covered by the compact class (WMF Peak 50). A size larger is worth it if peak times or growth are on the horizon.'},
-      {v:180, icon:'vol2', t:'81 to 180 cups',      d:'Regular daily business with peaks. ≈ 30 to 70 people.', x:'The mid-range (WMF 1300 S, 1500 S+) for noticeable but predictable demand – including milk variety.'},
-      {v:350, icon:'vol3', t:'More than 180 cups',  d:'Continuous operation or high-traffic location. ≈ 70 people or more.', x:'From here on, the premium models 5000 S+ and 9000 S+ take over – built for continuous load, parallel dispensing and large containers.'}
+      {v:80,  icon:'vol1', t:'Up to 80 cups',       d:'Small business, office floor or secondary outlet.', p:'For up to about 30 people', x:'Up to around 80 cups is covered by the compact class (WMF Peak 50). A size larger is worth it if peak times or growth are on the horizon.'},
+      {v:180, icon:'vol2', t:'81 to 180 cups',      d:'Regular daily business with peaks.', p:'For about 30 to 70 people', x:'The mid-range (WMF 1300 S, 1500 S+) for noticeable but predictable demand – including milk variety.'},
+      {v:350, icon:'vol3', t:'More than 180 cups',  d:'Continuous operation or high-traffic location.', p:'For 70 people and more', x:'From here on, the premium models 5000 S+ and 9000 S+ take over – built for continuous load, parallel dispensing and large containers.'}
     ],
     peaks:[
       {v:10, t:'Up to 10 cups'},
@@ -8160,6 +8166,11 @@ const state = {
 /* Der WMF-Pfeil aus den runden Kachel-Schaltflächen von Seite 1 –
    wird an alle primären Aktionen angehängt. */
 const ARROW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M15 6l6 6-6 6"/></svg>';
+/* Personen-Icon im WMF-Set-Stil (stroke 2, eckige Enden) für die
+   Personen-Schätzung an der Tassenleistung */
+const PERSONS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true">'+
+  '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/>'+
+  '<circle cx="16.8" cy="9" r="2.5"/><path d="M16.4 14.6c2.5.4 4.1 2.1 4.1 4.4"/></svg>';
 
 /* Info-Zeichen zu den Schritten – in der Formensprache des WMF-Icon-Sets
    (FIG_ICONS): Kreis auf dem 24er-Raster, Strichstärke 2, eckige Enden. */
@@ -10037,6 +10048,8 @@ function renderVolume(q){
         '<span class="optcard__body">'+
           '<span class="optcard__title">'+esc(o.t)+'</span>'+
           '<span class="optcard__desc">'+esc(o.d)+'</span>'+
+          /* Personen-Schätzung als eigene, deutlich abgesetzte Zeile */
+          (o.p ? '<span class="optcard__persons">'+PERSONS_ICON+esc(o.p)+'</span>' : '')+
         '</span>'+
         '<span class="mark-radio" aria-hidden="true"></span>'+
       '</button>';
@@ -10784,7 +10797,7 @@ function aspectOpen(aspect){
 function renderPlate(){
   const m = state.selectedMachine;
   const rows = ['<div class="plate__row"><span class="plate__key">Capacity</span>'+
-    '<span class="plate__val">up to '+m.cupsPerDay+' cups / day ('+personsLabel(m.cupsPerDay)+')</span></div>'];
+    '<span class="plate__val">up to '+m.cupsPerDay+' cups / day · <b>'+personsLabel(m.cupsPerDay)+'</b></span></div>'];
 
   ASPECTS.forEach(asp => {
     if(state.configuration[asp.key] === undefined) return;
@@ -11011,7 +11024,8 @@ function renderPdp(){
   const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">'+
     '<circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const facts = [
-    'Up to ' + m.cupsPerDay + ' cups per day (' + personsLabel(m.cupsPerDay) + ') · approx. ' + m.peak15 + ' cups per 15 minutes at peak',
+    'Up to ' + m.cupsPerDay + ' cups per day · approx. ' + m.peak15 + ' cups per 15 minutes at peak',
+    'Enough for around ' + personsApprox(m.cupsPerDay) + ' people (2–3 cups per person per day)',
     m.milkTypesMax ? 'Up to ' + m.milkTypesMax + ' milk type' + (m.milkTypesMax > 1 ? 's' : '') + ' in parallel'
                    : (m.steam.length ? 'Steam wand for milk foam' : 'Pure coffee machine – no milk system'),
     'Up to ' + maxBeans(m) + ' bean hopper' + (maxBeans(m) > 1 ? 's' : ''),
