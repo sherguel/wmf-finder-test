@@ -1203,8 +1203,6 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .cmp__cta{margin-top:18px;}
 /* Alternativen-Block unter der Zusammenfassung: 3 Maschinen nebeneinander */
 .result__alts{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:1px solid var(--line);}
-/* Hinweis-Link auf den Vergleich, unterhalb der CTA-Reihe */
-.result__altslink{margin-top:var(--sp-4);}
 /* Kompakte Seitenvariante in der rechten Detail-Spalte */
 .result__alts--side{margin-top:var(--sp-6);padding-top:var(--sp-6);}
 .cmp--side{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px;margin:var(--sp-4) 0 0;}
@@ -11390,12 +11388,6 @@ function renderSummary(){
             '<span class="match__sub">'+(ev.gaps.length ? ev.gaps.length + ' item(s) open' : 'All requirements met')+
           '</span></span></div>'+
         actionsHTML+
-        /* Hinweis auf den Vergleich weiter unten – von hier aus direkt
-           sichtbar, per Klick sanft dorthin scrollen */
-        (altsHTML
-          ? '<button type="button" class="reco__link reco__link--arrow result__altslink" id="btnJumpAlts">'+
-            'Compare with two alternative machines'+ARROW+'</button>'
-          : '')+
       '</div>'+
     '</div>'+
 
@@ -11434,11 +11426,6 @@ function renderSummary(){
     '</div>';
 
   bindMachineImageFallback($('summaryMount'));
-  const jump = $('btnJumpAlts');
-  if(jump) jump.addEventListener('click', () => {
-    const el = document.querySelector('.result__alts');
-    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-  });
   $('summaryMount').querySelectorAll('[data-altcfg]').forEach(b =>
     b.addEventListener('click', () => {
       const alt = MACHINES.filter(x => x.id === b.dataset.altcfg)[0];
