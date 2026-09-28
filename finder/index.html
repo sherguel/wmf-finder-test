@@ -1202,8 +1202,9 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .cmp__col--label .cmp__row{border-bottom-color:transparent;}
 .cmp__cta{margin-top:18px;}
 /* Alternativen-Block unter der Zusammenfassung: 3 Maschinen nebeneinander */
-/* Direkt nach dem Kopfblock (der bringt seine eigene Marge mit) */
-.result__alts{margin-top:0;padding-top:var(--sp-6);border-top:1px solid var(--line);}
+.result__alts{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:1px solid var(--line);}
+/* Hinweis-Link auf den Vergleich, unterhalb der CTA-Reihe */
+.result__altslink{margin-top:var(--sp-4);}
 .cmp--summary{grid-template-columns:150px repeat(3,minmax(0,1fr));}
 .cmp--summary .cmp__cta .btn{height:36px;padding:0 12px;font-size:13px;width:100%;white-space:nowrap;}
 @media(max-width:1000px){
@@ -11340,6 +11341,7 @@ function renderSummary(){
 
   /* V5: auch im Ergebnis das echte Konfigurationsfoto */
   const summaryVisual = machineVisual(m, state.configuration);
+  const altsHTML = summaryAlternativesHTML(m);
   /* Call-to-Actions AUF DEN ERSTEN BLICK: direkt oben rechts unter dem
      Match-Balken statt erst unter den Detail-Spalten (Wunsch Sep 2026). */
   const actionsHTML =
@@ -11378,13 +11380,14 @@ function renderSummary(){
             '<span class="match__sub">'+(ev.gaps.length ? ev.gaps.length + ' item(s) open' : 'All requirements met')+
           '</span></span></div>'+
         actionsHTML+
+        /* Hinweis auf den Vergleich weiter unten – von hier aus direkt
+           sichtbar, per Klick sanft dorthin scrollen */
+        (altsHTML
+          ? '<button type="button" class="reco__link reco__link--arrow result__altslink" id="btnJumpAlts">'+
+            'Compare with two alternative machines'+ARROW+'</button>'
+          : '')+
       '</div>'+
     '</div>'+
-
-    /* V8: Alternativen-Vergleich DIREKT unter dem Kopfblock, damit er
-       beim Abschluss sofort (zumindest angeschnitten) sichtbar ist –
-       die Detail-Spalten folgen darunter. */
-    summaryAlternativesHTML(m)+
 
     '<div class="result__cols">'+
       '<div>'+
@@ -11417,9 +11420,17 @@ function renderSummary(){
       '</div>'+
     '</div>'+
 
-    '';
+    /* Alternativen-Vergleich NACH den Konfigurations-Details – dank der
+       hochgezogenen CTAs deutlich höher als früher; der Link oben zeigt,
+       dass es ihn gibt. */
+    altsHTML;
 
   bindMachineImageFallback($('summaryMount'));
+  const jump = $('btnJumpAlts');
+  if(jump) jump.addEventListener('click', () => {
+    const el = document.querySelector('.result__alts');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
   $('summaryMount').querySelectorAll('[data-altcfg]').forEach(b =>
     b.addEventListener('click', () => {
       const alt = MACHINES.filter(x => x.id === b.dataset.altcfg)[0];
