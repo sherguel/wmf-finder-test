@@ -8939,7 +8939,9 @@ function priceRange(m, c){
   return {lo, hi, exact:lo === hi};
 }
 function priceLabel(r){
-  return r.exact ? eur(r.lo) : eur(r.lo) + ' – ' + eur(r.hi);
+  /* Ab-Preis-Darstellung (Wunsch Sep 2026): Spannen als „from <lo>“ –
+     ein exakter (fertig konfigurierter) Preis bleibt ohne Zusatz. */
+  return r.exact ? eur(r.lo) : 'from ' + eur(r.lo);
 }
 
 /* Aus den Finder-Antworten ableitbare Vorfestlegungen – damit die Spanne
@@ -11097,7 +11099,7 @@ function cmpRows(a, b){
     ['Water',           m => m.water.indexOf('tank') >= 0 ? 'fixed or tank' : 'fixed connection'],
     ['Dimensions (mm)', m => m.dims.join(' × ')],
     /* Preise nur bei online verkäuflichen Maschinen – sonst „on request“ */
-    ['Guide price range', m => priceVisible(m) ? priceLabel(priceRange(m, {})) : 'on request']
+    ['Guide price', m => priceVisible(m) ? priceLabel(priceRange(m, {})) : 'on request']
   ];
   return rows.map(r => {
     const va = val(a, r[1]), vb = val(b, r[1]);
