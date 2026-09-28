@@ -1202,7 +1202,8 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .cmp__col--label .cmp__row{border-bottom-color:transparent;}
 .cmp__cta{margin-top:18px;}
 /* Alternativen-Block unter der Zusammenfassung: 3 Maschinen nebeneinander */
-.result__alts{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:1px solid var(--line);}
+/* Direkt nach dem Kopfblock (der bringt seine eigene Marge mit) */
+.result__alts{margin-top:0;padding-top:var(--sp-6);border-top:1px solid var(--line);}
 .cmp--summary{grid-template-columns:150px repeat(3,minmax(0,1fr));}
 .cmp--summary .cmp__cta .btn{height:36px;padding:0 12px;font-size:13px;width:100%;white-space:nowrap;}
 @media(max-width:1000px){
@@ -1272,7 +1273,7 @@ body.is-veiled .salescontact{filter:blur(6px);}
    ========================================================================= */
 .result{padding-top:var(--sp-7);padding-bottom:var(--sp-9);}
 .result__top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--sp-7);align-items:center;margin-bottom:var(--sp-7);}
-.result__cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-8);border-top:1px solid var(--line);padding-top:var(--sp-6);}
+.result__cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-8);border-top:1px solid var(--line);padding-top:var(--sp-6);margin-top:var(--sp-8);}
 .result__blockhead{display:block;margin-bottom:var(--sp-4);}
 .reasons{display:grid;gap:var(--sp-4);}
 .reason{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-4);align-items:start;}
@@ -11361,6 +11362,11 @@ function renderSummary(){
       '</div>'+
     '</div>'+
 
+    /* V8: Alternativen-Vergleich DIREKT unter dem Kopfblock, damit er
+       beim Abschluss sofort (zumindest angeschnitten) sichtbar ist –
+       die Detail-Spalten folgen darunter. */
+    summaryAlternativesHTML(m)+
+
     '<div class="result__cols">'+
       '<div>'+
         '<span class="eyebrow result__blockhead">Summary</span>'+
@@ -11392,9 +11398,7 @@ function renderSummary(){
       '</div>'+
     '</div>'+
 
-    /* V6: Zwei Alternativmaschinen unter der fertigen Konfiguration –
-       Vergleich auf einen Blick (Rollen wie auf der Empfehlungsseite) */
-    summaryAlternativesHTML(m);
+    '';
 
   bindMachineImageFallback($('summaryMount'));
   $('summaryMount').querySelectorAll('[data-altcfg]').forEach(b =>
