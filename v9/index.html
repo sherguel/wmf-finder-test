@@ -1398,6 +1398,14 @@ body.is-veiled .salescontact{filter:blur(6px);}
   .afhelp-card__btn{width:auto;height:44px;padding:0 20px;font-size:14px;box-shadow:0 10px 26px rgba(20,12,6,.28);}
 }
 .quickpop__title{margin:2px 0 var(--sp-3);}
+/* =========================================================================
+   V9 = REINER FINDER (Wunsch Sep 2026): Konfigurator komplett raus –
+   keine Tab-Navigation (auch nicht nur „Machine Finder“), kein
+   „Configure a machine“-Button, kein PDP-Configure.
+   ========================================================================= */
+.flowtabs{display:none!important;}
+.cfgjump{display:none!important;}
+#btnPdpConfigure{display:none!important;}
 /* V9: Best-Match-Pop-up – Maschinenbühne wie auf den Empfehlungskarten */
 .earlypop__stage{
   height:210px;display:grid;place-items:center;margin:var(--sp-4) 0 0;
@@ -1898,9 +1906,9 @@ body.is-home .site-footer{display:none;}
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M15 6l6 6-6 6"/></svg>
         </button>
         <div class="hcard__copy hcard__copy--finder">
-          <span class="hcard__overline">Product Finder + Configurator</span>
+          <span class="hcard__overline">Product Finder</span>
           <h2>Find your machine<br/>in quick steps</h2>
-          <p>Specify your needs, compare three matching machines and then configure your choice right away.</p>
+          <p>Specify your needs, compare three matching machines and send your inquiry right away.</p>
         </div>
       </article>
 
@@ -10009,7 +10017,6 @@ function openEarlyPop(m, answered){
           encodeURIComponent(m.name)+'" target="_blank" rel="noopener">Buy in the online shop'+ARROW+'</a>'
         : '')+
       '<button type="button" class="btn '+(buyableOnline(m) ? 'btn--secondary' : 'btn--primary')+'" id="btnEarlyRecos">View my recommendation'+ARROW+'</button>'+
-      '<button type="button" class="btn btn--secondary" id="btnEarlyCfg">Configure this machine</button>'+
       '<button type="button" class="btn btn--quiet" data-close-early>Continue with the finder</button>'+
     '</div>';
   $('earlyPop').hidden = false;
@@ -10017,7 +10024,6 @@ function openEarlyPop(m, answered){
   focusOverlay($('earlyPop'));
   setVeil(true);
   $('btnEarlyRecos').addEventListener('click', () => { closeEarlyPop(); finishFinder(); });
-  $('btnEarlyCfg').addEventListener('click', () => { closeEarlyPop(); pickMachine(m.id); });
 }
 
 function closeEarlyPop(){
@@ -10600,7 +10606,7 @@ function renderRecos(){
              verkäufliche Maschinen (Elevation 10, Peak 50) – alle anderen
              führen an deren Stelle direkt in die Anfrage. */
           '<div class="reco__ctarow">'+
-            '<button type="button" class="btn btn--secondary reco__cfgbtn" data-cfg="'+esc(m.id)+'">Configure</button>'+
+            /* V9 reiner Finder: kein Configure-Button auf den Karten */
             (buyableOnline(m)
               ? '<button class="btn btn--primary reco__buy" '+
                 'data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with the '+esc(m.name)+'.">Buy'+ARROW+'</button>'
@@ -11886,6 +11892,11 @@ function downloadSummary(){
    13. NAVIGATION
    ========================================================================= */
 function showView(name){
+  /* V9: reiner Finder – Konfigurator-Ansichten sind stillgelegt */
+  if(name === 'config' || name === 'pick' || name === 'compare' || name === 'summary'){
+    toast('The configurator is not part of this version.');
+    return;
+  }
   state.view = name;
   if(name === 'recos') state.currentStep = 1;
   if(name === 'config'){
