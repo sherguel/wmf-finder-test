@@ -451,7 +451,9 @@ body.af-vrail .flowbar{border-bottom:0;}
   .crumbs--inline{padding:10px 0 8px;}
   /* 16 px breiter: die Fortschrittslinie ragt 8 px je Seite über die
      Pillen hinaus */
-  .crumbs--inline .crumbpills{width:max-content;justify-content:flex-start;gap:8px;padding-inline:8px;}
+  /* Mobil: Indicator so breit wie die Bilder darunter – gleiche
+     Seitenränder wie .wrap, Pillen über die volle Breite verteilt */
+  .crumbs--inline .crumbpills{width:100%;justify-content:space-between;gap:6px;padding-inline:0;}
   /* Top-Karte auf Mobile nicht skalieren – sonst stimmen die
      Randabstände der einspaltigen Karten nicht mehr überein */
   .reco--best{transform:none;}
