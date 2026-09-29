@@ -387,6 +387,11 @@ ul{list-style:none;padding:0;}
 .iconbtn--dark:hover{background:rgba(13,13,13,.07);}
 .flowbar__contact{font-weight:720;font-size:15px;color:var(--ink);padding:8px 2px;}
 .flowbar__contact:hover{color:var(--brown-dark);}
+/* Mobil: wie auf wmf-coffeemachines.com kein „Contact"-Text im Header –
+   Kontakt läuft über Menü bzw. die schwebenden Kontakt-Elemente */
+@media(max-width:620px){
+  .flowbar__contact,.home-head__contact{display:none;}
+}
 .flowbar__mark{justify-self:center;cursor:pointer;padding:4px 8px;border-radius:8px;transition:background .2s var(--ease);}
 .flowbar__mark:hover{background:rgba(13,13,13,.05);}
 /* Original-WMF-Logo (eingebettet) in der Kopfleiste */
