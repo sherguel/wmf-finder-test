@@ -1076,9 +1076,12 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .reco__link--arrow{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;margin-top:2px;}
 .reco__link--arrow svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s var(--ease);}
 .reco__link--arrow:hover svg{transform:translateX(2px);}
-.reco__ctarow{margin-top:auto;display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap;padding:10px 0;}
-.reco__cfgbtn{padding:0 22px;}
-.reco__buy{padding:0 28px;}
+/* Kompakte Buttons, damit Configure + Buy/Send inquiry sicher in EINE
+   Zeile passen (unterschiedliche Umbrüche machten die Karten ungleich) */
+.reco__ctarow{margin-top:auto;display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;padding:10px 0 0;}
+.reco__ctarow .btn{height:38px;font-size:14px;}
+.reco__cfgbtn{padding:0 18px;}
+.reco__buy{padding:0 18px;}
 /* Kompakter, damit Key-Facts UND Preis ohne Scrollen sichtbar sind */
 /* Kopfbereich der Karte: Name linksbündig, Maschinenbild (transparent,
    ohne weiße Box) etwas größer rechtsbündig auf derselben Ebene */
@@ -1387,8 +1390,12 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .afhelp-card__t{font-size:16px;font-weight:720;color:var(--ink);letter-spacing:-.01em;line-height:1.25;}
 .afhelp-card__s{font-size:14px;line-height:1.45;color:var(--text-2);margin-bottom:12px;}
 .afhelp-card__btn{width:100%;height:38px;font-size:14px;}
+/* Mobil: NUR der Button (Wunsch Sep 2026) – die volle Karte verdeckte
+   Next-Buttons und Antwortkarten. Die Kartenhülle wird unsichtbar. */
 @media(max-width:620px){
-  .afhelp-card{right:16px;bottom:16px;}
+  .afhelp-card{right:16px;bottom:16px;width:auto;padding:0;background:transparent;border:0;box-shadow:none;}
+  .afhelp-card__head,.afhelp-card__s{display:none;}
+  .afhelp-card__btn{width:auto;height:44px;padding:0 20px;font-size:14px;box-shadow:0 10px 26px rgba(20,12,6,.28);}
 }
 .quickpop__title{margin:2px 0 var(--sp-3);}
 /* V9: Best-Match-Pop-up – Maschinenbühne wie auf den Empfehlungskarten */
@@ -1400,6 +1407,15 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .earlypop__stage img{max-height:180px;max-width:70%;width:auto;height:auto;object-fit:contain;}
 .earlypop__stage svg{display:none;}
 .earlypop__actions{margin-top:var(--sp-4);gap:10px;}
+/* Mobil/Tablet: Pop-up-Aktionen vollbreit untereinander, Bühne kompakter */
+@media(max-width:620px){
+  .earlypop__actions{gap:8px;}
+  .earlypop__actions .btn{width:100%;}
+  .earlypop__stage{height:168px;}
+  .earlypop__stage img{max-height:148px;}
+  .infopanel{padding:14px;}
+  .infopanel__card{padding:var(--sp-5);}
+}
 /* V9: Leasing-Zeile unter der Preisspanne auf den Empfehlungskarten */
 .pricerange__lease{display:block;margin-top:4px;font-size:13px;font-weight:680;color:var(--brown);}
 /* Direkter Draht (Telefon/Mail/Zeiten) als kompakte Zeile über dem Formular */
@@ -10562,6 +10578,16 @@ function renderRecos(){
                 '<span class="eyebrow pricerange__l">Individual quote from WMF sales</span>')+
           '</div>'+
 
+          /* Requirements-Checks IN der Karte (Wunsch Sep 2026) */
+          '<div class="reco__fit">'+
+            '<p class="reco__status">'+(r.gaps.length
+              ? r.gaps.length + ' of ' + ((r.checks || []).length + r.gaps.length) + ' requirements open.'
+              : 'All of your requirements met.')+'</p>'+
+            '<ul class="reco__checks">'+checkRows+'</ul>'+
+            (moreCount > 0 ? '<p class="reco__morechecks">+ '+moreCount+' more</p>' : '')+
+            (splitNote ? '<p class="reco__splitnote">'+esc(splitNote)+'</p>' : '')+
+          '</div>'+
+
           /* Button-Reihe Configure (Secondary) · Buy bzw. Send inquiry
              (Primary), linksbündig. Kaufen gibt es nur für online
              verkäufliche Maschinen (Elevation 10, Peak 50) – alle anderen
@@ -10577,16 +10603,19 @@ function renderRecos(){
       '</article>'+
 
       '<div class="reco__below">'+
-        '<p class="reco__status">'+(r.gaps.length
-          ? r.gaps.length + ' of ' + ((r.checks || []).length + r.gaps.length) + ' requirements open.'
-          : 'All of your requirements met.')+'</p>'+
-        '<ul class="reco__checks">'+checkRows+'</ul>'+
-        (moreCount > 0 ? '<p class="reco__morechecks">+ '+moreCount+' more</p>' : '')+
-        (splitNote ? '<p class="reco__splitnote">'+esc(splitNote)+'</p>' : '')+
         '<p class="reco__rolenote">'+esc(r.note)+'</p>'+
       '</div>'+
     '</div>';
   }).join('');
+
+  /* Gleiche Kartenhöhen in der mehrspaltigen Ansicht (Wunsch Sep 2026):
+     die CTA-Reihe sitzt per margin-top:auto immer auf der Unterkante */
+  if(matchMedia('(min-width:861px)').matches){
+    const cards = Array.prototype.slice.call($('recosMount').querySelectorAll('.reco'));
+    let maxH = 0;
+    cards.forEach(c => { c.style.minHeight = ''; maxH = Math.max(maxH, c.offsetHeight); });
+    cards.forEach(c => { c.style.minHeight = Math.ceil(maxH) + 'px'; });
+  }
 
   $('recosMount').querySelectorAll('[data-cfg]').forEach(b => {
     b.addEventListener('click', () => pickMachine(b.dataset.cfg));
