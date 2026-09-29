@@ -10472,15 +10472,16 @@ function renderRecos(){
                 '<span class="eyebrow pricerange__l">Individual quote from WMF sales</span>')+
           '</div>'+
 
-          /* Button-Reihe Configure (Secondary) · Buy (Primary), linksbündig.
-             Kaufen gibt es nur für online verkäufliche Maschinen
-             (Elevation 10, Peak 50) – alle anderen laufen über den Vertrieb. */
+          /* Button-Reihe Configure (Secondary) · Buy bzw. Send inquiry
+             (Primary), linksbündig. Kaufen gibt es nur für online
+             verkäufliche Maschinen (Elevation 10, Peak 50) – alle anderen
+             führen an deren Stelle direkt in die Anfrage. */
           '<div class="reco__ctarow">'+
             '<button type="button" class="btn btn--secondary reco__cfgbtn" data-cfg="'+esc(m.id)+'">Configure</button>'+
             (buyableOnline(m)
               ? '<button class="btn btn--primary reco__buy" '+
                 'data-placeholder="The purchase process is not yet implemented in this mock-up version – this is where the cart would start with the '+esc(m.name)+'.">Buy'+ARROW+'</button>'
-              : '')+
+              : '<button type="button" class="btn btn--primary reco__buy" data-inq="'+esc(m.id)+'">Send inquiry'+ARROW+'</button>')+
           '</div>'+
         '</div>'+
       '</article>'+
@@ -10499,6 +10500,16 @@ function renderRecos(){
 
   $('recosMount').querySelectorAll('[data-cfg]').forEach(b => {
     b.addEventListener('click', () => pickMachine(b.dataset.cfg));
+  });
+  /* „Send inquiry" auf Karten nicht kaufbarer Maschinen: Anfrage mit
+     Interessens-Hinweis auf genau diese Maschine öffnen */
+  $('recosMount').querySelectorAll('[data-inq]').forEach(b => {
+    b.addEventListener('click', () => {
+      state.inquiryMachine = b.dataset.inq;
+      state.inquiryFrom = 'recos';
+      state.inquiryTopic = null;
+      showView('inquiry');
+    });
   });
 
   /* Inszenierung des Ergebnisses: Der Prozentwert zählt hoch, die
@@ -11249,6 +11260,14 @@ function renderInquiry(){
     ? MACHINES.filter(x => x.id === state.pdpId)[0] : null;
   if(pdpMachine){
     lines.push('I am interested in the ' + pdpMachine.name + ' (' + pdpMachine.typeLabel + ').');
+    lines.push('');
+  }
+  /* Anfrage über den „Send inquiry"-Button einer Empfehlungskarte:
+     die konkrete Maschine als Interesse voranstellen */
+  const inqMachine = (!pdpMachine && state.inquiryMachine)
+    ? MACHINES.filter(x => x.id === state.inquiryMachine)[0] : null;
+  if(inqMachine){
+    lines.push('I am interested in the ' + inqMachine.name + ' (' + inqMachine.typeLabel + ').');
     lines.push('');
   }
   /* V6: Wunsch nach individuellem Service-Angebot aus dem Service-Schritt */
@@ -12192,6 +12211,7 @@ function init(){
   function openInquiry(){
     if(state.view !== 'inquiry') state.inquiryFrom = state.view;
     state.inquiryTopic = null;
+    state.inquiryMachine = null;   /* generische Anfrage: kein Karten-Interesse */
     showView('inquiry');
   }
   const inquiryReturn = () => showView(state.inquiryFrom || 'recos');
