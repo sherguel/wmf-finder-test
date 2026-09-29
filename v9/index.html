@@ -714,8 +714,17 @@ body.is-veiled .salescontact{filter:blur(6px);}
   /* Kompakter an die Resume-Leiste heran (war sp-6/32px) */
   padding-top:var(--sp-4);
 }
-/* 10px näher an den Step-Indicator (38 statt 48) – Wunsch Sep 2026 */
-.af-resume{margin:38px 0 0;}
+/* 10px näher an den Step-Indicator (38 statt 48) – Wunsch Sep 2026.
+   .resume.af-resume: schlägt die spätere .resume-Regel (margin-bottom). */
+.resume.af-resume{margin:38px 0 24px;}
+/* Mobil: noch kompakter um die Resume-Leiste herum (Wunsch Sep 2026) */
+@media(max-width:620px){
+  .resume.af-resume{margin:16px 0 8px;}
+  .afinder{padding-top:10px;}
+  /* Der 14px-Ausgleich zur Desktop-Bühne ist mobil unnötig
+     (.afinder .afsect: schlägt die spätere .afsect-Basisregel) */
+  .afinder .afsect{padding-top:0;}
+}
 .af-resume[hidden]{display:none;}
 .afinder__flow{padding:0 0 var(--sp-9);display:flex;flex-direction:column;gap:clamp(44px,6vh,68px);min-width:0;}
 
