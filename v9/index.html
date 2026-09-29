@@ -711,9 +711,11 @@ body.is-veiled .salescontact{filter:blur(6px);}
   --afh:min(580px, calc(100vh - var(--afstick,196px) - 32px));
   display:grid;grid-template-columns:minmax(0,1fr) minmax(440px,600px);
   gap:clamp(28px,4vw,56px);align-items:start;
-  padding-top:var(--sp-6);
+  /* Kompakter an die Resume-Leiste heran (war sp-6/32px) */
+  padding-top:var(--sp-4);
 }
-.af-resume{margin:var(--sp-7) 0 0;}
+/* 10px näher an den Step-Indicator (38 statt 48) – Wunsch Sep 2026 */
+.af-resume{margin:38px 0 0;}
 .af-resume[hidden]{display:none;}
 .afinder__flow{padding:0 0 var(--sp-9);display:flex;flex-direction:column;gap:clamp(44px,6vh,68px);min-width:0;}
 
