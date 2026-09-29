@@ -1406,12 +1406,16 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .afhelp-card__t{font-size:16px;font-weight:720;color:var(--ink);letter-spacing:-.01em;line-height:1.25;}
 .afhelp-card__s{font-size:14px;line-height:1.45;color:var(--text-2);margin-bottom:12px;}
 .afhelp-card__btn{width:100%;height:38px;font-size:14px;}
-/* Mobil: NUR der Button (Wunsch Sep 2026) – die volle Karte verdeckte
-   Next-Buttons und Antwortkarten. Die Kartenhülle wird unsichtbar. */
+/* Der Hörer im Button ist nur in der mobilen Icon-Form sichtbar */
+.afhelp-card__btnphone{display:none;}
+/* Mobil: NUR ein kompakter runder Icon-Button (Wunsch Sep 2026) – die
+   volle Karte verdeckte Next-Buttons und Antwortkarten. */
 @media(max-width:620px){
   .afhelp-card{right:16px;bottom:16px;width:auto;padding:0;background:transparent;border:0;box-shadow:none;}
   .afhelp-card__head,.afhelp-card__s{display:none;}
-  .afhelp-card__btn{width:auto;height:44px;padding:0 20px;font-size:14px;box-shadow:0 10px 26px rgba(20,12,6,.28);}
+  .afhelp-card__btntxt,.afhelp-card__btnarrow{display:none;}
+  .afhelp-card__btnphone{display:block;width:20px;height:20px;}
+  .afhelp-card__btn{width:52px;height:52px;padding:0;border-radius:50%;box-shadow:0 10px 26px rgba(20,12,6,.3);}
 }
 .quickpop__title{margin:2px 0 var(--sp-3);}
 /* Direkter Draht (Telefon/Mail/Zeiten) als kompakte Zeile über dem Formular */
@@ -2750,7 +2754,7 @@ body.is-home .site-footer{display:none;}
     <span class="afhelp-card__t">Personal advice from the start.</span>
   </div>
   <p class="afhelp-card__s">You don&rsquo;t have to answer every question &ndash; our sales team will find the right machine with you.</p>
-  <button type="button" class="btn btn--primary afhelp-card__btn" id="afHelpBtn">Contact sales<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M15 6l6 6-6 6"/></svg></button>
+  <button type="button" class="btn btn--primary afhelp-card__btn" id="afHelpBtn" aria-label="Contact sales"><svg class="afhelp-card__btnphone" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.9999 16.9201V19.9201C22.0011 20.1986 21.944 20.4743 21.8324 20.7294C21.7209 20.9846 21.5572 21.2137 21.352 21.402C21.1468 21.5902 20.9045 21.7336 20.6407 21.8228C20.3769 21.912 20.0973 21.9452 19.8199 21.9201C16.7428 21.5857 13.7869 20.5342 11.1899 18.8501C8.77376 17.3148 6.72527 15.2663 5.18993 12.8501C3.49991 10.2413 2.44818 7.27109 2.11993 4.1801C2.09494 3.90356 2.12781 3.62486 2.21643 3.36172C2.30506 3.09859 2.4475 2.85679 2.6347 2.65172C2.82189 2.44665 3.04974 2.28281 3.30372 2.17062C3.55771 2.05843 3.83227 2.00036 4.10993 2.0001H7.10993C7.59524 1.99532 8.06572 2.16718 8.43369 2.48363C8.80166 2.80008 9.04201 3.23954 9.10993 3.7201C9.23656 4.68016 9.47138 5.62282 9.80993 6.5301C9.94448 6.88802 9.9736 7.27701 9.89384 7.65098C9.81408 8.02494 9.6288 8.36821 9.35993 8.6401L8.08993 9.9101C9.51349 12.4136 11.5864 14.4865 14.0899 15.9101L15.3599 14.6401C15.6318 14.3712 15.9751 14.1859 16.3491 14.1062C16.723 14.0264 17.112 14.0556 17.4699 14.1901C18.3772 14.5286 19.3199 14.7635 20.2799 14.8901C20.7657 14.9586 21.2093 15.2033 21.5265 15.5776C21.8436 15.9519 22.0121 16.4297 21.9999 16.9201Z"/></svg><span class="afhelp-card__btntxt">Contact sales</span><svg class="afhelp-card__btnarrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h17M15 6l6 6-6 6"/></svg></button>
 </div>
 
 <!-- =========================================================================
