@@ -1807,7 +1807,10 @@ body.is-home .site-footer{display:none;}
   .numrow--photo .ticks{margin-top:26px;}
   .recoshero{padding:28px 0 var(--sp-3);}
   .recos--overlap{margin-top:0;}
-  .introhero{min-height:calc(100vh - 60px);padding:64px 0;}
+  /* KEIN Top-Padding: Der Header (Logo) bleibt exakt auf der Höhe der
+     Startbühne – vorher sprang das WMF-Logo beim Wechsel um 64px. */
+  .introhero{min-height:calc(100vh - 60px);padding:0 0 64px;}
+  .introhero__inner{padding-top:72px;}
   .introhero__facts{gap:14px;flex-wrap:wrap;}
 }
 </style>
