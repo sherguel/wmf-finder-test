@@ -1121,6 +1121,7 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .reco__cta .btn{height:34px;padding:0 20px;font-size:13px;gap:8px;}
 .reco__cta .btn svg{width:13px;height:13px;}
 .reco__links{display:flex;align-items:center;justify-content:flex-start;gap:24px;margin-top:var(--sp-3);}
+a.reco__link{text-decoration:none;}   /* Details als echter Link */
 .reco__link{
   appearance:none;-webkit-appearance:none;background:none;border:0;border-radius:0;
   padding:2px 0;font:inherit;font-size:13px;font-weight:660;color:var(--ink);
@@ -8482,6 +8483,24 @@ function buyableOnline(m){
 const SHOP_URLS = {
   'peak-50': 'https://shop.wmf-coffeemachines.com/de_de/wmf-peak-50-standardmodell-1'
 };
+/* Echte Produktdetailseiten auf wmf-coffeemachines.com (EN) – Pfade
+   exakt wie im Produktseiten-Snapshot verlinkt */
+const WEB_PDP_PATHS = {
+  '1500-f':'filter-coffee-machines/wmf-1500-f',
+  '9000-f':'filter-coffee-machines/wmf-9000-f',
+  '1300-s':'fully-automatic-coffee-machines/wmf-1300-s',
+  '1500-s-plus':'fully-automatic-coffee-machines/wmf-1500-s-plus',
+  '5000-s-plus':'fully-automatic-coffee-machines/wmf-5000-s-plus',
+  '9000-s-plus':'fully-automatic-coffee-machines/wmf-9000-s-plus',
+  'peak-50':'fully-automatic-coffee-machines/wmf-peak-50',
+  'espresso-next':'portafilter-machines/wmf-espresso-next'
+};
+function webPdpUrl(m){
+  return WEB_PDP_PATHS[m.id]
+    ? 'https://www.wmf-coffeemachines.com/en_com/products/' + WEB_PDP_PATHS[m.id] + '/'
+    : null;
+}
+
 function shopUrl(m){
   return SHOP_URLS[m.id] ||
     'https://shop.wmf-coffeemachines.com/catalogsearch/result/?q=' + encodeURIComponent(m.name);
@@ -10602,8 +10621,10 @@ function renderRecos(){
             '<h3 class="t-md reco__name">'+esc(m.name)+'</h3>'+
             '<span class="eyebrow reco__type">'+esc(m.typeLabel)+'</span>'+
             /* Details-Pfeil-Link direkt unter dem Maschinennamen */
-            '<button type="button" class="reco__link reco__link--arrow" '+
-              'data-placeholder="The product detail page (PDP) for the '+esc(m.name)+' is not included in this mock-up.">Details'+ARROW+'</button>'+
+            (webPdpUrl(m)
+              ? '<a class="reco__link reco__link--arrow" href="'+esc(webPdpUrl(m))+'" target="_blank" rel="noopener">Details'+ARROW+'</a>'
+              : '<button type="button" class="reco__link reco__link--arrow" '+
+                'data-placeholder="The product detail page (PDP) for the '+esc(m.name)+' is not included in this mock-up.">Details'+ARROW+'</button>')+
           '</div>'+
           '<div class="reco__stage">'+machineFigure(m)+'</div>'+
         '</div>'+
