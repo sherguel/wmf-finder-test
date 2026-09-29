@@ -9953,15 +9953,20 @@ function afConfirm(q){
    nach 2 beantworteten Fragen, höchstens einmal je Finder-Lauf.
    ========================================================================= */
 function checkEarlyMatch(answered){
-  if(state.earlyMatchShown || answered < 2) return;
+  /* Ab der 3. beantworteten Frage: Sobald der AKTUELLE SPITZENREITER
+     (gleiches Ranking wie buildRecommendations) 100 % ohne offene
+     Ausschlusskriterien erreicht, greift das Pop-up ein. Die frühere
+     Regel „genau EINE perfekte Maschine" feuerte praktisch nie. */
+  if(state.earlyMatchShown || answered < 3) return;
   const a = state.finderAnswers;
-  const perfect = MACHINES.filter(m => {
-    const ev = evaluate(m, a);
-    return ev.pct === 100 && !ev.gaps.length;
-  });
-  if(perfect.length !== 1) return;
+  const ranked = MACHINES.map(m => ({m:m, ev:evaluate(m, a)}))
+    .sort((x, y) => (x.ev.hardFails - y.ev.hardFails) ||
+                    (y.ev.score - x.ev.score) ||
+                    (x.m.priceFrom - y.m.priceFrom));
+  const top = ranked[0];
+  if(!top || top.ev.hardFails || top.ev.pct !== 100) return;
   state.earlyMatchShown = true;
-  openEarlyPop(perfect[0], answered);
+  openEarlyPop(top.m, answered);
 }
 
 function openEarlyPop(m, answered){
@@ -9976,7 +9981,7 @@ function openEarlyPop(m, answered){
     '<span class="eyebrow eyebrow--copper infopanel__h">Your best match</span>'+
     '<h3 class="t-md" style="margin-bottom:6px">We&rsquo;ve already found your best match</h3>'+
     '<p class="infopanel__t">After '+answered+' of '+qs.length+' questions, the <b>'+esc(m.name)+'</b>'+
-      ' is the only machine that meets all of your requirements &ndash; a 100&nbsp;% match. '+
+      ' already meets all of your requirements &ndash; a 100&nbsp;% match and our current front-runner. '+
       'Jump straight to the result &ndash; or simply finish the finder as planned.</p>'+
     '<div class="earlypop__stage">'+machineFigure(m)+'</div>'+
     '<div class="actionbar earlypop__actions">'+
