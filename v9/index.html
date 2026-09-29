@@ -10036,11 +10036,11 @@ function afConfirm(q){
    nach 2 beantworteten Fragen, höchstens einmal je Finder-Lauf.
    ========================================================================= */
 function checkEarlyMatch(answered){
-  /* Ab der 3. beantworteten Frage: Sobald der AKTUELLE SPITZENREITER
+  /* Ab der 2. beantworteten Frage: Sobald der AKTUELLE SPITZENREITER
      (gleiches Ranking wie buildRecommendations) 100 % ohne offene
      Ausschlusskriterien erreicht, greift das Pop-up ein. Die frühere
      Regel „genau EINE perfekte Maschine" feuerte praktisch nie. */
-  if(state.earlyMatchShown || answered < 3) return;
+  if(state.earlyMatchShown || answered < 2) return;   /* ab Frage 2 (Wunsch Sep 2026) */
   const a = state.finderAnswers;
   const ranked = MACHINES.map(m => ({m:m, ev:evaluate(m, a)}))
     .sort((x, y) => (x.ev.hardFails - y.ev.hardFails) ||
