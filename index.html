@@ -1073,7 +1073,6 @@ body.is-veiled .salescontact{filter:blur(6px);}
 }
 
 /* Checkliste unter der Karte – bewusst ruhig und hell wie im Vorbild */
-.reco__below{padding:18px 8px 0;}
 /* Split-Hinweis: kleine braune Zeile unter den Specs einer Karte –
    z. B. „2 × diese Maschine wäre ebenfalls eine Alternative". */
 .reco__splitnote{font-size:13px;font-weight:640;color:var(--brown);margin-top:10px;line-height:1.5;}
@@ -1090,6 +1089,8 @@ body.is-veiled .salescontact{filter:blur(6px);}
 .reco__checks li.is-gap svg{color:#8A5A20;}
 .reco__morechecks{font-size:14px;font-weight:640;color:var(--ink);margin-top:2px;}
 .reco__rolenote{font-size:13px;color:var(--text-3);line-height:1.5;margin-top:12px;}
+/* Rollen-Hinweis in der Karte (Okt 2026): sitzt zwischen Checks und CTA */
+.reco__rolenote--in{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--line);}
 /* Details in eigener Reihe (Pfeil-Link), darunter Configure · Buy –
    mit etwas Luft nach oben und unten */
 .reco__link--arrow{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;margin-top:2px;}
@@ -10553,6 +10554,9 @@ function renderRecos(){
             (splitNote ? '<p class="reco__splitnote">'+esc(splitNote)+'</p>' : '')+
           '</div>'+
 
+          /* Rollen-Hinweis IN der Karte (Wunsch Okt 2026, vorher unter der Karte) */
+          '<p class="reco__rolenote reco__rolenote--in">'+esc(r.note)+'</p>'+
+
           /* Button-Reihe Configure (Secondary) · Buy bzw. Send inquiry
              (Primary), linksbündig. Kaufen gibt es nur für online
              verkäufliche Maschinen (Elevation 10, Peak 50) – alle anderen
@@ -10566,10 +10570,6 @@ function renderRecos(){
           '</div>'+
         '</div>'+
       '</article>'+
-
-      '<div class="reco__below">'+
-        '<p class="reco__rolenote">'+esc(r.note)+'</p>'+
-      '</div>'+
     '</div>';
   }).join('');
 
